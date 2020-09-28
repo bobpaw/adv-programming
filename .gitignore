@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# vscode output
+.vscode/
+
+# Probably cmake, etc. output
+*/out/
