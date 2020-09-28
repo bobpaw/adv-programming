@@ -2,36 +2,62 @@
 #include <string>
 #include <iostream>
 
+// Used by implementation but not by declaration
+#include <iterator>
+#include <fstream>
+#include <stdexcept>
+
 #ifndef AIDEN_CSV_H
 #define AIDEN_CSV_H
 
 namespace csv {
   class Collection {
     using Row = std::vector<std::string>;
-    using Row_index = decltype(Row::size);
     Row headers;
     std::vector<Row> data;
+    using size_type = decltype(data)::size_type;
 
-    bool read_file (std::string filename); // Overwrites data
-    bool read_file (std::istream stream);
-    Collection (std::string filename); // Should call Collection(std::istream)
-    Collection (std::istream stream);
-    Collection (decltype(headers) h, decltype(data) d);
+    bool read_file (std::string filename, int header_line); // Overwrites data
+    bool read_file (std::istream stream, int header_line);
 
-    Row_index add_row (Row, Row_index position);
-    Row&& remove_row (Row_index position);
+    Collection (std::string filename): Collection(std::ifstream(filename)) {}
+    Collection (std::istream stream) {
+      if (stream.eof()) {
+        return; // i.e. empty object
+      } else if (stream.fail()) {
+        throw new std::exception("Failure opening the file or something.");
+      } else {
+        std::string line;
+        std::string next_value;
+        bool quoted = false;
+        while (std::getline(stream, line)) {
+          // Process text
+        }
+      }
+    }
+    Collection (decltype(headers) h, decltype(data) d): headers(h), data(d) {};
 
-    Row_index push_row (Row);
-    Row&& pop_row ();
+    size_type add_row (Row v, size_type position) {
+      auto i = data.insert(data.begin() + position, v);
+      return std::distance(data.begin(), i);
+    };
+    void remove_row (size_type position) {
+      data.erase(data.begin() + position);
+    };
 
-    Row_index unshift_row (Row);
-    Row&& shift_row ();
+    /*
+    // These should all call add_row or remove_row
+    size_type push_row (Row);
+    void pop_row ();
+    size_type unshift_row (Row);
+    void shift_row ();
+    */
 
-    Row row (Row_index i) const;
-    Row& row (Row_index i);
+    const Row& row (size_type i) const { return data.at(i); }
+    Row& row (size_type i) { return data.at(i); }
 
-    Row operator[] (Row_index i) const noexcept;
-    Row& operator[] (Row_index i) noexcept;
+    const Row& operator[] (size_type i) const noexcept { return data[i]; }
+    Row& operator[] (size_type i) noexcept { return data[i]; };
   };
 } // namespace csv
 
