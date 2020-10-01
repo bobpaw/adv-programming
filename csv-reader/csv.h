@@ -17,21 +17,56 @@ namespace csv {
     std::vector<Row> data;
     using size_type = decltype(data)::size_type;
 
+    public:
+
     bool read_file (std::string filename, int header_line); // Overwrites data
     bool read_file (std::istream stream, int header_line);
 
     Collection (std::string filename): Collection(std::ifstream(filename)) {}
-    Collection (std::istream stream) {
+    Collection (std::istream stream): headers(), data() {
       if (stream.eof()) {
         return; // i.e. empty object
       } else if (stream.fail()) {
         throw new std::exception("Failure opening the file or something.");
       } else {
-        std::string line;
+        char ch;
+        Row next_row;
         std::string next_value;
         bool quoted = false;
-        while (std::getline(stream, line)) {
-          // Process text
+        while (stream >> ch) {
+          if (quoted && ch != '"') {
+            next_value += ch;
+            continue;
+          }
+          switch (ch) {
+            case '"':
+              if (stream.peek() == '"') {
+                next_value += ch;
+                stream.get();
+              } else {
+                quoted = !quoted;
+              }
+              break;
+            case ',':
+              next_row.push_back(next_value);
+              next_value.clear();
+              break;
+            case '\r': break;
+            case '\n':
+              if (next_row.size() && next_value.size() == 0) continue;
+              next_row.push_back(next_value);
+              next_value.clear();
+              data.push_back(next_row);
+              next_row.clear();
+              break;
+            default:
+              next_value += ch;
+          }
+        }
+        if (stream.eof()); // Success
+        else {
+          std::cerr << "An error occurred." << std::endl;
+          throw std::runtime_error("Error reading file");
         }
       }
     }
