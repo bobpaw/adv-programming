@@ -27,7 +27,7 @@ namespace csv {
       if (stream.eof()) {
         return; // i.e. empty object
       } else if (stream.fail()) {
-        throw new std::exception("Failure opening the file or something.");
+        throw new std::runtime_error("Failure opening the file or something.");
       } else {
         char ch;
         Row next_row;
