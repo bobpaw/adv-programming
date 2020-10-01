@@ -19,16 +19,17 @@ namespace csv {
 
     public:
 
-    bool read_file (std::string filename, int header_line); // Overwrites data
-    bool read_file (std::istream stream, int header_line);
-
-    Collection (std::string filename): Collection(std::ifstream(filename)) {}
-    Collection (std::istream stream): headers(), data() {
+    // Destructive
+    bool read_file (std::string filename, int header_line = -1) {
+      return read_file(std::ifstream(filename), header_line);
+    }
+    bool read_file (std::istream& stream, int header_line = -1) {
       if (stream.eof()) {
         return; // i.e. empty object
       } else if (stream.fail()) {
-        throw new std::runtime_error("Failure opening the file or something.");
+        throw std::runtime_error("Failure opening the file or something.");
       } else {
+        data.clear();
         char ch;
         Row next_row;
         std::string next_value;
@@ -63,12 +64,17 @@ namespace csv {
               next_value += ch;
           }
         }
-        if (stream.eof()); // Success
-        else {
-          std::cerr << "An error occurred." << std::endl;
-          throw std::runtime_error("Error reading file");
+        if (header_line != -1) {
+          headers = data[header_line - 1];
+          data.erase(data.begin(), data.begin() + (header_line - 1)); // Discard everything up to the headers
         }
+        return stream.eof();
       }
+    }
+
+    Collection (std::string filename): Collection(std::ifstream(filename)) {}
+    Collection (std::istream& stream): headers(), data() {
+      read_file(stream);
     }
     Collection (decltype(headers) h, decltype(data) d): headers(h), data(d) {};
 
