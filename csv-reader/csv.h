@@ -23,9 +23,12 @@ namespace csv {
     bool read_file (std::string filename, int header_line = -1) {
       std::ifstream is;
       is.open(filename);
+      bool ret;
       if (is.is_open()) {
-        return read_file(std::ifstream(filename), header_line);
+        ret = read_file(is, header_line);
       }
+      is.close();
+      return ret;
     }
     bool read_file (std::istream& stream, int header_line = -1) {
       data.clear();
