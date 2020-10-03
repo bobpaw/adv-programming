@@ -56,6 +56,6 @@ endif()
 add_subdirectory(src)
 
 # Only enable testing if this is the top-level project or it's a test build
-if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/" AND (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR ADV_PROG_BUILD_TESTING AND BUILD_TESTING)
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/" AND (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR ADV_PROG_BUILD_TESTING) AND BUILD_TESTING)
 	add_subdirectory(test)
 endif()
