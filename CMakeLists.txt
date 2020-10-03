@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8) # First version with CMP0067
-project(PROJECT_NAME adv_prog VERSION 0.0 LANGUAGES C CXX)
+project(adv_prog VERSION 0.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 cmake_policy(SET CMP0067 NEW) # Force CMake to observe CXX_STANDARD in checks
