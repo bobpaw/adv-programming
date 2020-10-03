@@ -20,10 +20,10 @@ namespace csv {
     public:
 
     // Destructive
-    bool read_file (std::string filename, int header_line = -1) {
+    bool read_file (std::string filename, int header_line = -1) { // FIXME: Find another way to specify possibly no headers
       std::ifstream is;
       is.open(filename);
-      bool ret;
+      bool ret = false;
       if (is.is_open()) {
         ret = read_file(is, header_line);
       }
@@ -72,7 +72,7 @@ namespace csv {
               next_value += ch;
           }
         }
-        if (header_line != -1) {
+        if (header_line >= 0 && header_line < data.size()) {
           headers = data[header_line - 1];
           data.erase(data.begin(), data.begin() + (header_line - 1)); // Discard everything up to the headers
         }
@@ -81,10 +81,10 @@ namespace csv {
     }
 
     Collection (std::string filename) {
-      read_file(filename);
+        if (!read_file(filename)) throw std::runtime_error("Failed to construct object from filename.");
     }
     Collection (std::istream& stream): headers(), data() {
-      read_file(stream);
+      if (!read_file(stream)) throw std::runtime_error("Failed to construct object from stream.");
     }
     Collection (decltype(headers) h, decltype(data) d): headers(h), data(d) {};
 
