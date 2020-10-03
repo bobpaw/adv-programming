@@ -21,11 +21,16 @@ namespace csv {
 
     // Destructive
     bool read_file (std::string filename, int header_line = -1) {
-      return read_file(std::ifstream(filename), header_line);
+      std::ifstream is;
+      is.open(filename);
+      if (is.is_open()) {
+        return read_file(std::ifstream(filename), header_line);
+      }
     }
     bool read_file (std::istream& stream, int header_line = -1) {
+      data.clear();
       if (stream.eof()) {
-        return; // i.e. empty object
+        return true; // i.e. empty object
       } else if (stream.fail()) {
         throw std::runtime_error("Failure opening the file or something.");
       } else {
@@ -72,7 +77,9 @@ namespace csv {
       }
     }
 
-    Collection (std::string filename): Collection(std::ifstream(filename)) {}
+    Collection (std::string filename) {
+      read_file(filename);
+    }
     Collection (std::istream& stream): headers(), data() {
       read_file(stream);
     }
