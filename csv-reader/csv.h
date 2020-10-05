@@ -97,6 +97,9 @@ namespace csv {
     void remove_row (size_type position) {
       data.erase(data.begin() + position);
     };
+    void remove_rows (size_type first, size_type last) {
+        data.erase(data.begin() + first, data.begin() + last);
+    }
 
     /*
     // These should all call add_row or remove_row
@@ -125,6 +128,10 @@ namespace csv {
     Row::size_type col (const std::string& heading) const {
         auto it = std::find(headers.begin(), headers.end(), heading);
         return it == headers.end() ? -1 : std::distance(headers.begin(), it);
+    }
+    size_type row (std::function<bool(const Row&)> pred) const {
+        auto it = std::find_if(data.begin(), data.end(), pred);
+        return it == data.end() ? -1 : std::distance(data.begin(), it);
     }
 
     // Calls std::sort using comp
