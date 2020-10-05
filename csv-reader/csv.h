@@ -20,7 +20,7 @@ namespace csv {
     public:
 
     // Destructive
-    bool read_file (std::string filename, int header_line = -1) { // FIXME: Find another way to specify possibly no headers
+    bool read_file (std::string filename, size_type header_line = -1) { // FIXME: Find another way to specify possibly no headers
       std::ifstream ifs;
       ifs.open(filename);
       bool ret = false;
@@ -30,7 +30,7 @@ namespace csv {
       ifs.close();
       return ret;
     }
-    bool read_file (std::istream& stream, int header_line = -1) {
+    bool read_file (std::istream& stream, size_type header_line = -1) {
       if (stream.eof()) {
         return true; // i.e. empty object
       } else if (stream.fail()) {
@@ -70,7 +70,7 @@ namespace csv {
               }
           }
         }
-        if (header_line >= 0 && header_line < data.size()) {
+        if (header_line != -1 && header_line < data.size()) {
           headers = data[header_line - 1];
           data.erase(data.begin(), data.begin() + (header_line - 1)); // Discard everything up to the headers
         }
