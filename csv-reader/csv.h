@@ -21,55 +21,53 @@ namespace csv {
 
     // Destructive
     bool read_file (std::string filename, int header_line = -1) { // FIXME: Find another way to specify possibly no headers
-      std::ifstream is;
-      is.open(filename);
+      std::ifstream ifs;
+      ifs.open(filename);
       bool ret = false;
-      if (is.is_open()) {
-        ret = read_file(is, header_line);
+      if (ifs) {
+        ret = read_file(ifs, header_line);
       }
-      is.close();
+      ifs.close();
       return ret;
     }
     bool read_file (std::istream& stream, int header_line = -1) {
-      data.clear();
       if (stream.eof()) {
         return true; // i.e. empty object
       } else if (stream.fail()) {
         throw std::runtime_error("Failure opening the file or something.");
       } else {
         data.clear();
-        char ch;
         Row next_row;
         std::string next_value;
         bool quoted = false;
-        while (stream >> ch) {
+        for (char ch = stream.get(); stream; stream.get(ch)) {
           if (quoted && ch != '"') {
             next_value += ch;
-            continue;
-          }
-          switch (ch) {
-            case '"':
-              if (stream.peek() == '"') {
-                next_value += ch;
-                stream.get();
-              } else {
-                quoted = !quoted;
+          } else {
+              switch (ch) {
+                  case '"':
+                      if (stream.peek() == '"') {
+                          next_value += ch;
+                          stream.get();
+                      } else {
+                          quoted = !quoted;
+                      }
+                      break;
+                  case ',':
+                      next_row.push_back(next_value);
+                      next_value.clear();
+                      break;
+                  case '\r': break;
+                  case '\n':
+                      if (next_row.size() == 0) continue;
+                      next_row.push_back(next_value);
+                      next_value.clear();
+                      data.push_back(next_row);
+                      next_row.clear();
+                      break;
+                  default:
+                      next_value += ch;
               }
-              break;
-            case ',':
-              next_row.push_back(next_value);
-              next_value.clear();
-              break;
-            case '\r': break;
-            case '\n':
-              if (next_row.size() && next_value.size() == 0) continue;
-              next_row.push_back(next_value);
-              next_value.clear();
-              data.push_back(next_row);
-              next_row.clear();
-              break;
-            default:
-              next_value += ch;
           }
         }
         if (header_line >= 0 && header_line < data.size()) {
@@ -109,6 +107,10 @@ namespace csv {
 
     const Row& operator[] (size_type i) const noexcept { return data[i]; }
     Row& operator[] (size_type i) noexcept { return data[i]; };
+
+    size_type size () const {
+        return data.size();
+    }
   };
 } // namespace csv
 
