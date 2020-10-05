@@ -1,23 +1,23 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <functional>
 
 // Used by implementation but not by declaration
 #include <iterator>
 #include <fstream>
 #include <stdexcept>
+#include <algorithm>
 
 #ifndef AIDEN_CSV_H
 #define AIDEN_CSV_H
 
 namespace csv {
-  class Collection {
+  struct Collection {
     using Row = std::vector<std::string>;
     Row headers;
     std::vector<Row> data;
     using size_type = decltype(data)::size_type;
-
-    public:
 
     // Destructive
     bool read_file (std::string filename, size_type header_line = -1) { // FIXME: Find another way to specify possibly no headers
@@ -72,19 +72,23 @@ namespace csv {
         }
         if (header_line != -1 && header_line < data.size()) {
           headers = data[header_line - 1];
-          data.erase(data.begin(), data.begin() + (header_line - 1)); // Discard everything up to the headers
+          data.erase(data.begin(), data.begin() + header_line); // Discard everything up to the headers
         }
         return stream.eof();
       }
     }
 
-    Collection (std::string filename) {
-        if (!read_file(filename)) throw std::runtime_error("Failed to construct object from filename.");
+    Collection (std::string filename, size_type header_line = -1) {
+        if (!read_file(filename, header_line)) throw std::runtime_error("Failed to construct object from filename.");
     }
-    Collection (std::istream& stream): headers(), data() {
-      if (!read_file(stream)) throw std::runtime_error("Failed to construct object from stream.");
+    Collection (std::istream& stream, size_type header_line = -1): headers(), data() {
+      if (!read_file(stream, header_line)) throw std::runtime_error("Failed to construct object from stream.");
     }
     Collection (decltype(headers) h, decltype(data) d): headers(h), data(d) {};
+
+    size_type size () const {
+        return data.size();
+    }
 
     size_type add_row (Row v, size_type position) {
       auto i = data.insert(data.begin() + position, v);
@@ -108,8 +112,24 @@ namespace csv {
     const Row& operator[] (size_type i) const noexcept { return data[i]; }
     Row& operator[] (size_type i) noexcept { return data[i]; };
 
-    size_type size () const {
-        return data.size();
+    // Obviously a column but they're the same thing
+    Row operator[] (std::string heading) const {
+        if (heading == "" || headers.size() == 0 || std::find(headers.begin(), headers.end(), heading) == headers.end()) return Row();
+        Row ret;
+        ret.reserve(size());
+        Row::size_type col = std::distance(headers.begin(), std::find(headers.begin(), headers.end(), heading));
+        for (Row e : data) ret.push_back(e[col]);
+        return ret;
+    }
+
+    Row::size_type col (const std::string& heading) const {
+        auto it = std::find(headers.begin(), headers.end(), heading);
+        return it == headers.end() ? -1 : std::distance(headers.begin(), it);
+    }
+
+    // Calls std::sort using comp
+    void sort (std::function<bool(const Row&, const Row&)> comp) {
+        std::sort(data.begin(), data.end(), comp);
     }
   };
 } // namespace csv
