@@ -14,6 +14,9 @@ struct node {
 	node* left;
 	node* right;
 	int height;
+
+	node(int v, node* l, node* r): key_value(v), left(l), right(r), height(0) {}
+	node(int v): node(v, nullptr, nullptr) {}
 };
 
 

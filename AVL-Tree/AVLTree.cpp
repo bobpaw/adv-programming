@@ -4,7 +4,7 @@
 
 AVLTree::AVLTree() { root = NULL; }
 
-AVLTree::~AVLTree() {}
+AVLTree::~AVLTree() { clear(root); }
 
 struct node* AVLTree::get_node(int val) {
 	struct node* new_node = new node;
@@ -47,17 +47,20 @@ struct node* AVLTree::right_rotate(struct node* tree) {
 	struct node* left = tree->left;
 	struct node* right = left->right;
 	// perform rotation
+	left->right = tree;
+	tree->left = right;
 
-	//** <Your code here >
-
+	tree->height = max(HEIGHT(tree->left), HEIGHT(tree->right)) + 1;
+	left->height = max(HEIGHT(left->left), HEIGHT(left->right)) + 1;
 	// return new tree
 	return left;
 }
 
 
 struct node* AVLTree::insert(struct node* tree, int val) {
-	//** <Your code here >
+	/* <Your code here> */
 
+	if (!tree) 
 	// normal insertion
 	// update height of tree
 
@@ -66,23 +69,23 @@ struct node* AVLTree::insert(struct node* tree, int val) {
 	// check for balancing
 	// left-left case
 	 if(balance ? ?? && ?? key_value ? val){
-		 //** <Your code here >
+		 /* <Your code here> */
 
 		 // tree = ;
 	 }
    //right-right case
    else if(balance ? ?? && ?? key_value ? val){
-		 //** <Your code here >
+		 /* <Your code here> */
 		 // tree =
 	 }
    //left-right case
    else if(balance ? ?? && ?? key_value ? val){
-		 //** <Your code here >
+		 /* <Your code here> */
 
 	 }
    //right-left case
    else if(balance ? ?? && ?? key_value ? val){
-		 //** <Your code here >
+		 /* <Your code here> */
 	 }
 
 
@@ -126,7 +129,7 @@ struct node* AVLTree::inorder_succ_right_tree(struct node* tree) {
 }
 
 struct node* AVLTree::deletion(struct node* tree, int val) {
-	//** <Your code here >
+	/* <Your code here> */
 
 	// normal deletion
 	// ...
