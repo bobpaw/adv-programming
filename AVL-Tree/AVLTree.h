@@ -2,30 +2,28 @@
 #ifndef AVLTREE_H
 #define AVLTREE_H
 
-#include<stdlib.h>  
-#include<stdio.h>  
+#include <stdio.h>
+#include <stdlib.h>
 
- 
-//#define HEIGHT 1  
+
+//#define HEIGHT 1
 #define HEIGHT(t) ((t == NULL) ? 0 : t->height)
 
-struct node
-{  
-	int key_value;  
-	node* left;  
-	node* right;  
-	int height;  
+struct node {
+	int key_value;
+	node* left;
+	node* right;
+	int height;
 };
 
 
-class AVLTree
-{
+class AVLTree {
 public:
 	AVLTree();
 	~AVLTree();
 
-	node*	root;
-	
+	node* root;
+
 	struct node* get_node(int val);
 	int get_height(struct node* root);
 	int get_balance(struct node* root);
@@ -45,7 +43,6 @@ public:
 	int sumorder(struct node* tree);
 	void clear(struct node* tree);
 	void display(node*, int level, int dir);
-	 
 };
 
-#endif // AVLTREE_H
+#endif  // AVLTREE_H
